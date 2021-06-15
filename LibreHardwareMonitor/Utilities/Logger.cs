@@ -85,15 +85,28 @@ namespace LibreHardwareMonitor.Utilities
             return AppDomain.CurrentDomain.BaseDirectory + Path.DirectorySeparatorChar + string.Format(FileNameFormat, date);
         }
 
+        private static string GetHeaderFileName()
+        {
+            return AppDomain.CurrentDomain.BaseDirectory + Path.AltDirectorySeparatorChar + "LibreHardwareMonitorLog-headers.csv";
+        }
+
         private bool OpenExistingLogFile()
         {
-            if (!File.Exists(_fileName))
-                return false;
+            string headerFileName = _fileName;
+            if (!File.Exists(headerFileName))
+            {
+                headerFileName = GetHeaderFileName();
+                if (!File.Exists(headerFileName))
+                {
+                    return false;
+                }
+            }
+                
 
             try
             {
                 string line;
-                using (StreamReader reader = new StreamReader(_fileName))
+                using (StreamReader reader = new StreamReader(headerFileName))
                     line = reader.ReadLine();
 
                 if (string.IsNullOrEmpty(line))
